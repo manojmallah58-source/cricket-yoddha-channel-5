@@ -1,53 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Live TV</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cric Yoddha - Live TV</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-<script type="text/javascript" src="https://pl28294740.effectivegatecpm.com/4d/45/99/4d459939f33b21f08186d13fcab97399.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --accent: #ef4444;
+            --dark-bg: #0f172a;
+            --glass: rgba(30, 41, 59, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --tg-blue: #0088cc;
+        }
 
-<style>
-body, html {
-  background: black;
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-/* Video Section */
-#video-box {
-  width: 100%;
-  height: 100vh;
-  background: black;
-}
+        body { background-color: var(--dark-bg); color: white; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
 
-iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-</style>
+        .app-header { height: 60px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(15px); display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); }
+        .logo { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: 1px; }
+        .logo span { color: var(--primary); }
+
+        .container { padding: 15px; max-width: 600px; margin: auto; }
+
+        .tv-card { background: var(--glass); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+
+        #player-area { width: 100%; aspect-ratio: 16 / 9; background: #000; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; display:none; }
+
+        .preview-screen { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; justify-content: center; align-items: center; background-size: cover; background-position: center; }
+        .preview-screen::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+
+        .play-circle { width: 65px; height: 65px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; z-index: 2; cursor: pointer; box-shadow: 0 0 25px rgba(37, 99, 235, 0.6); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .live-badge { position: absolute; top: 15px; left: 15px; background: var(--accent); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 5px; z-index: 5; }
+        .live-dot { width: 6px; height: 6px; background: white; border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        .detail-box { padding: 18px; }
+        .channel-name { font-size: 12px; font-weight: 600; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; }
+        .match-title { font-size: 17px; font-weight: 600; line-height: 1.4; color: #f1f5f9; }
+
+        /* --- TELEGRAM POPUP STYLES --- */
+        #tg-popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: none;
+            justify-content: center; align-items: center; z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+
+        .tg-card {
+            background: #1e293b; width: 85%; max-width: 350px;
+            padding: 30px; border-radius: 25px; text-align: center;
+            border: 1px solid var(--tg-blue);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .tg-icon { font-size: 50px; color: var(--tg-blue); margin-bottom: 15px; }
+        .tg-card h3 { margin-bottom: 10px; font-size: 20px; }
+        .tg-card p { font-size: 14px; color: #94a3b8; margin-bottom: 25px; }
+
+        .btn-join { 
+            background: var(--tg-blue); color: white; border: none;
+            width: 100%; padding: 14px; border-radius: 12px;
+            font-weight: 700; cursor: pointer; display: block;
+            text-decoration: none; margin-bottom: 12px;
+            transition: 0.3s;
+        }
+
+        .btn-already {
+            background: transparent; color: #94a3b8; border: 1px solid #334155;
+            width: 100%; padding: 12px; border-radius: 12px;
+            font-weight: 500; cursor: pointer;
+        }
+
+        #offline-screen { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; }
+        #offline-screen i { font-size: 50px; color: #475569; margin-bottom: 20px; }
+        .shimmer { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { to { background-position: -200% 0; } }
+    </style>
 </head>
-
 <body>
 
-<div id="video-box">
-  <iframe id="iframe"
-    src="https://cricketstan.github.io/TNT-1"
-    width="100%" 
-    height="100%"
-    frameborder="0"
-    webkitAllowFullScreen
-    mozallowfullscreen
-    allowfullscreen
-    allow="autoplay; encrypted-media; gyroscope; picture-in-picture">
-  </iframe>
-</div>
+    <div id="tg-popup-overlay">
+        <div class="tg-card">
+            <i class="fab fa-telegram tg-icon"></i>
+            <h3>Join Telegram</h3>
+            <p>Sabhi matches ki live updates aur links ke liye hamara channel join karein!</p>
+            <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" class="btn-join" onclick="closePopup()">JOIN TELEGRAM</a>
+            <button class="btn-already" onclick="closePopup()">ALREADY JOINED</button>
+        </div>
+    </div>
 
+    <header class="app-header">
+        <div class="logo">CRIC <span>YODDHA</span></div>
+    </header>
+
+    <div class="container">
+        <div class="tv-card" id="main-content">
+            <div id="player-area">
+                <div id="preview-overlay" class="preview-screen shimmer">
+                    <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+                    <div class="play-circle" onclick="playLive()"><i class="fas fa-play"></i></div>
+                </div>
+                <iframe id="video-frame" src="" allowfullscreen allow="autoplay"></iframe>
+            </div>
+
+            <div class="detail-box">
+                <div class="channel-name" id="display-channel">Loading...</div>
+                <h1 class="match-title" id="display-title">Fetching Live Match Data...</h1>
+            </div>
+        </div>
+
+        <div id="offline-screen">
+            <i class="fas fa-satellite-dish"></i>
+            <h2>Broadcast Offline</h2>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6a6kH-_7jFTEEIhMTwEOLKMLj7qmtLgQ",
+            authDomain: "cric-yoddha.firebaseapp.com",
+            databaseURL: "https://cric-yoddha-default-rtdb.firebaseio.com",
+            projectId: "cric-yoddha",
+            storageBucket: "cric-yoddha.firebasestorage.app",
+            messagingSenderId: "340220638066",
+            appId: "1:340220638066:web:1360dc2c34e3b8b7a263eb"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        let liveUrl = "";
+
+        database.ref('liveData').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                document.getElementById('display-channel').innerText = data.channelName || "Sports Channel";
+                document.getElementById('display-title').innerText = data.matchTitle || "Live Match";
+                document.getElementById('preview-overlay').style.backgroundImage = `url('${data.thumbnail}')`;
+                document.getElementById('preview-overlay').classList.remove('shimmer');
+                liveUrl = data.streamUrl;
+
+                if (data.appStatus === "LIVE") {
+                    document.getElementById('main-content').style.display = 'block';
+                    document.getElementById('offline-screen').style.display = 'none';
+                } else {
+                    document.getElementById('main-content').style.display = 'none';
+                    document.getElementById('offline-screen').style.display = 'flex';
+                }
+            }
+        });
+
+        function playLive() {
+            if (liveUrl) {
+                const frame = document.getElementById('video-frame');
+                const overlay = document.getElementById('preview-overlay');
+                
+                frame.src = liveUrl;
+                overlay.style.display = 'none';
+                frame.style.display = 'block';
+
+                // --- 5 SECOND TIMER FOR TELEGRAM POPUP ---
+                setTimeout(() => {
+                    document.getElementById('tg-popup-overlay').style.display = 'flex';
+                }, 5000); 
+            }
+        }
+
+        function closePopup() {
+            document.getElementById('tg-popup-overlay').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
 
