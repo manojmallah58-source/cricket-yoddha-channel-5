@@ -18,27 +18,29 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
         body { background: var(--bg); color: var(--text); overflow-x: hidden; width: 100vw; }
 
-        /* ElevenLabs Style Auth Section */
+        /* --- ElevenLabs Style Auth Section --- */
         #auth-screen { position: fixed; inset: 0; background: #fff; z-index: 5000; display: none; align-items: center; justify-content: center; padding: 20px; color: #000; }
         .auth-card { width: 100%; max-width: 400px; text-align: center; }
-        .auth-card h1 { font-size: 28px; margin-bottom: 30px; font-weight: 700; }
+        .auth-card h1 { font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -1px; }
+        .auth-card p.subtitle { color: #666; font-size: 14px; margin-bottom: 30px; }
         input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 16px; margin-bottom: 15px; }
-        .btn-auth { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-auth { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px; }
+        .toggle-text { margin-top: 20px; font-size: 14px; color: #4b5563; }
+        .toggle-text span { font-weight: 700; cursor: pointer; color: #000; text-decoration: underline; }
 
-        /* Main Dashboard UI */
+        /* --- Main Dashboard --- */
         #main-app { display: none; }
         .header { padding: 20px; font-weight: 700; font-size: 22px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
         .container { padding: 0 15px 20px 15px; max-width: 550px; margin: auto; }
 
-        /* Video Player Area */
+        /* Player Section */
         #player-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 20px; display: none; border: 1px solid var(--border); }
         video, iframe { width: 100%; height: 100%; border: none; }
 
-        /* Content section that hides permanently on play */
+        /* Content (Hides when playing) */
         #content-wrapper { display: block; }
         .featured-card { background: var(--card); border-radius: 25px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 20px; cursor: pointer; }
         .thumb-area { position: relative; width: 100%; aspect-ratio: 16/9; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
-        .live-badge { position: absolute; top: 15px; left: 15px; background: #ef4444; color: white; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
         .play-btn { width: 50px; height: 50px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
         .card-info { padding: 15px; }
 
@@ -48,7 +50,7 @@
         .btn-tg-join { display: block; background: var(--tg); color: #fff; text-decoration: none; padding: 12px; border-radius: 12px; font-weight: 700; margin-top: 15px; font-size: 14px; }
         .btn-tg-already { background: transparent; border: none; color: #64748b; width: 100%; padding: 10px; font-weight: 600; margin-top: 5px; cursor: pointer; font-size: 12px; }
 
-        /* Exit Dialog */
+        /* Exit Popup */
         #exit-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; }
         .exit-box { background: #1e293b; width: 85%; max-width: 320px; padding: 30px; border-radius: 25px; text-align: center; border: 1px solid var(--border); }
     </style>
@@ -67,11 +69,17 @@
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h1>Welcome back</h1>
-            <input type="email" id="email" placeholder="email@example.com">
-            <input type="password" id="password" placeholder="••••••••">
-            <button class="btn-auth" onclick="handleAuth()">Sign in</button>
-            <p style="margin-top:20px; font-size:14px; color:#4b5563;">Don't have an account? <span style="font-weight:700; cursor:pointer;" onclick="toggleMode()">Sign up</span></p>
+            <h1 id="auth-title">Welcome back</h1>
+            <p class="subtitle" id="auth-subtitle">Please enter your details to sign in.</p>
+            
+            <input type="email" id="email" placeholder="Email Address">
+            <input type="password" id="password" placeholder="Password">
+            
+            <button class="btn-auth" id="auth-btn" onclick="handleAuth()">Sign in</button>
+            
+            <p class="toggle-text" id="toggle-wrapper">
+                Don't have an account? <span onclick="toggleAuthMode()">Sign up</span>
+            </p>
         </div>
     </div>
 
@@ -80,7 +88,7 @@
         <div class="container">
             <div id="player-box">
                 <video id="hls-video" controls autoplay playsinline style="display:none;"></video>
-                <iframe id="embed-frame" allowfullscreen allow="autoplay; encrypted-media" style="display:none;"></iframe>
+                <iframe id="embed-frame" allowfullscreen allow="autoplay" style="display:none;"></iframe>
             </div>
 
             <div id="content-wrapper">
@@ -114,6 +122,7 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
+        let isSignUpMode = false;
         let hls;
 
         auth.onAuthStateChanged(user => {
@@ -127,9 +136,37 @@
             }
         });
 
+        // --- AUTH TOGGLE LOGIC ---
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+            const btn = document.getElementById('auth-btn');
+            const toggleWrapper = document.getElementById('toggle-wrapper');
+
+            if (isSignUpMode) {
+                title.innerText = "Create account";
+                subtitle.innerText = "Join Cric Yoddha today.";
+                btn.innerText = "Sign up";
+                toggleWrapper.innerHTML = `Already have an account? <span onclick="toggleAuthMode()">Sign in</span>`;
+            } else {
+                title.innerText = "Welcome back";
+                subtitle.innerText = "Please enter your details to sign in.";
+                btn.innerText = "Sign in";
+                toggleWrapper.innerHTML = `Don't have an account? <span onclick="toggleAuthMode()">Sign up</span>`;
+            }
+        }
+
         function handleAuth() {
-            const e = document.getElementById('email').value, p = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(e, p).catch(() => auth.createUserWithEmailAndPassword(e, p));
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            if(!e || !p) { alert("Please fill all fields"); return; }
+
+            if (isSignUpMode) {
+                auth.createUserWithEmailAndPassword(e, p).catch(err => alert(err.message));
+            } else {
+                auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
+            }
         }
 
         function loadData() {
@@ -141,12 +178,11 @@
                     list.innerHTML += `
                         <div class="featured-card" onclick="playMatch('${d.url}')">
                             <div class="thumb-area" style="background-image: url('${d.logo}')">
-                                <div class="live-badge">LIVE</div>
                                 <div class="play-btn"><i class="fas fa-play"></i></div>
                             </div>
                             <div class="card-info">
                                 <p style="color:var(--primary); font-size:11px; font-weight:700;">${d.name}</p>
-                                <h3 style="margin-top:5px; color:#fff;">${d.title}</h3>
+                                <h3 style="color:#fff;">${d.title}</h3>
                             </div>
                         </div>`;
                 });
@@ -154,13 +190,9 @@
         }
 
         function playMatch(url) {
-            const v = document.getElementById('hls-video'), f = document.getElementById('embed-frame'), box = document.getElementById('player-box');
-            box.style.display = 'block';
-            
-            // --- THE PERMANENT FIX ---
-            // Jaise hi match play hoga, niche ki thumbnails hamesha ke liye hide ho jayengi
+            document.getElementById('player-box').style.display = 'block';
             document.getElementById('content-wrapper').style.display = 'none';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const v = document.getElementById('hls-video'), f = document.getElementById('embed-frame');
 
             if (url.includes('.m3u8')) {
                 f.style.display = 'none'; v.style.display = 'block';
@@ -168,24 +200,17 @@
                     if (hls) hls.destroy();
                     hls = new Hls(); hls.loadSource(url); hls.attachMedia(v);
                     hls.on(Hls.Events.MANIFEST_PARSED, () => v.play());
-                } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
-                    v.src = url; v.play();
-                }
+                } else { v.src = url; v.play(); }
             } else {
                 if (hls) hls.destroy();
                 v.style.display = 'none'; f.style.display = 'block'; f.src = url;
             }
 
-            setTimeout(() => {
-                document.getElementById('tg-overlay').style.display = 'flex';
-            }, 10000);
+            setTimeout(() => { document.getElementById('tg-overlay').style.display = 'flex'; }, 10000);
         }
 
-        // --- UPDATED POPUP CLOSING LOGIC ---
         function alreadyJoined() {
-            // Popup band hone par bhi niche thumbnails nahi aayengi
             document.getElementById('tg-overlay').style.display = 'none';
-            // Yeh line ensure karegi ki niche ka section hide hi rahe jaisa aapne screenshot me dikhaya hai
             document.getElementById('content-wrapper').style.display = 'none';
         }
 
@@ -199,3 +224,4 @@
     </script>
 </body>
 </html>
+
