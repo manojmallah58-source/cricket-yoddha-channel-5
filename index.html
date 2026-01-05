@@ -20,24 +20,15 @@
         /* --- AUTH SCREEN --- */
         #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card { background: var(--card); width: 100%; max-width: 400px; padding: 30px; border-radius: 30px; border: 1px solid var(--border); text-align: center; }
-        
-        .btn-google { width: 100%; padding: 12px; background: #fff; color: #000; border: none; border-radius: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-bottom: 20px; }
-        
-        .separator { display: flex; align-items: center; color: #4b5563; font-size: 12px; margin-bottom: 20px; }
-        .separator::before, .separator::after { content: ""; flex: 1; height: 1px; background: var(--border); margin: 0 10px; }
-        
         input { width: 100%; padding: 15px; margin-bottom: 12px; background: #0f172a; border: 1px solid var(--border); border-radius: 15px; color: #fff; outline: none; }
         .btn-auth { width: 100%; padding: 16px; background: var(--primary); border: none; border-radius: 15px; color: #fff; font-weight: 700; cursor: pointer; }
-        
         #error-box { background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 12px; padding: 10px; border-radius: 10px; margin-bottom: 15px; display: none; }
 
         /* --- EXIT POPUP (As per Screenshot) --- */
         #exit-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(5px); }
-        .exit-box { background: #1e293b; width: 85%; max-width: 320px; padding: 35px 25px; border-radius: 30px; text-align: center; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .exit-box h3 { font-size: 22px; margin-bottom: 10px; color: #fff; }
-        .exit-box p { font-size: 14px; color: #9ca3af; margin-bottom: 30px; }
-        .exit-btns { display: flex; gap: 15px; }
-        .btn-exit { flex: 1; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; border: none; font-size: 16px; text-transform: uppercase; }
+        .exit-box { background: #1e293b; width: 85%; max-width: 320px; padding: 35px 25px; border-radius: 30px; text-align: center; border: 1px solid var(--border); }
+        .exit-btns { display: flex; gap: 15px; margin-top: 25px; }
+        .btn-exit { flex: 1; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; border: none; }
         .btn-yes { background: #ef4444; color: white; }
         .btn-no { background: #334155; color: white; }
 
@@ -45,18 +36,25 @@
         #main-app { display: none; }
         .header { height: 65px; background: var(--card); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--border); }
         .container { padding: 15px; max-width: 600px; margin: auto; }
-        #player-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 25px; display: none; border: 1px solid var(--border); }
-        iframe { width: 100%; height: 100%; border: none; }
-        .channel-item { background: var(--card); border-radius: 20px; padding: 12px; display: flex; align-items: center; margin-bottom: 12px; border: 1px solid var(--border); cursor: pointer; }
-        .channel-item img { width: 55px; height: 55px; border-radius: 15px; margin-right: 15px; object-fit: cover; }
+        
+        /* Video Player Area Fix */
+        #player-box { 
+            width: 100%; aspect-ratio: 16/9; background: #000; 
+            border-radius: 20px; overflow: hidden; margin-bottom: 25px; 
+            display: none; border: 1px solid var(--border); 
+        }
+        #video-frame { width: 100%; height: 100%; border: none; }
+
+        .channel-item { background: var(--card); border-radius: 20px; padding: 15px; display: flex; align-items: center; margin-bottom: 12px; border: 1px solid var(--border); cursor: pointer; }
+        .channel-item img { width: 55px; height: 55px; border-radius: 12px; margin-right: 15px; object-fit: cover; }
     </style>
 </head>
 <body>
 
     <div id="exit-overlay">
         <div class="exit-box">
-            <h3>Exit App?</h3>
-            <p>Are you sure you want to close the application?</p>
+            <h3 style="color:white; margin-bottom:10px;">Exit App?</h3>
+            <p style="color:#9ca3af;">Are you sure you want to close the application?</p>
             <div class="exit-btns">
                 <button class="btn-exit btn-yes" onclick="confirmExit()">YES</button>
                 <button class="btn-exit btn-no" onclick="closeExit()">NO</button>
@@ -67,20 +65,10 @@
     <div id="auth-screen">
         <div class="auth-card">
             <h2 id="auth-title">Welcome back</h2>
-            <p id="auth-desc" style="font-size: 13px; color:#94a3b8; margin-bottom:20px;">Sign in to continue</p>
-            
-            <button class="btn-google" onclick="googleSignIn()">
-                <img src="https://img.icons8.com/color/24/000000/google-logo.png"/> Sign in with Google
-            </button>
-            
-            <div class="separator">OR</div>
             <div id="error-box"></div>
-            
-            <input type="email" id="email" placeholder="Email Address">
+            <input type="email" id="email" placeholder="Email">
             <input type="password" id="password" placeholder="Password">
-            
             <button class="btn-auth" id="main-btn" onclick="handleAuth()">SIGN IN</button>
-            
             <p style="margin-top:20px; font-size:13px; color:#94a3b8;">
                 Don't have an account? <span onclick="toggleMode()" id="toggle-link" style="color:var(--primary); cursor:pointer; font-weight:600;">Sign Up</span>
             </p>
@@ -89,11 +77,11 @@
 
     <div id="main-app">
         <header class="header">
-            <div style="font-weight:700; font-size:18px;">CRIC <span style="color:var(--primary)">YODDHA</span></div>
+            <div style="font-weight:700;">CRIC <span style="color:var(--primary)">YODDHA</span></div>
             <i class="fas fa-sign-out-alt" onclick="logout()" style="color:#64748b; cursor:pointer;"></i>
         </header>
         <div class="container">
-            <div id="player-box"><iframe id="video-frame" src="" allowfullscreen allow="autoplay"></iframe></div>
+            <div id="player-box"><iframe id="video-frame" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe></div>
             <div id="channel-list"></div>
         </div>
     </div>
@@ -111,7 +99,6 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
-        const provider = new firebase.auth.GoogleAuthProvider();
 
         let mode = "signin";
 
@@ -120,7 +107,6 @@
             document.getElementById('auth-title').innerText = mode === "signin" ? "Welcome back" : "Create Account";
             document.getElementById('main-btn').innerText = mode === "signin" ? "SIGN IN" : "SIGN UP";
             document.getElementById('toggle-link').innerText = mode === "signin" ? "Sign Up" : "Sign In";
-            document.getElementById('error-box').style.display = 'none';
         }
 
         async function handleAuth() {
@@ -131,14 +117,13 @@
             if(mode === "signin") {
                 auth.signInWithEmailAndPassword(e, p).catch(err => {
                     if(err.code === "auth/user-not-found") showError("Account not found! Please Sign Up first.");
-                    else showError("Invalid email or password.");
+                    else showError("Invalid details.");
                 });
             } else {
                 auth.createUserWithEmailAndPassword(e, p).catch(err => showError(err.message));
             }
         }
 
-        function googleSignIn() { auth.signInWithPopup(provider).catch(err => showError(err.message)); }
         function showError(m) { const b = document.getElementById('error-box'); b.innerText = m; b.style.display = 'block'; }
         function logout() { auth.signOut(); }
 
@@ -168,7 +153,9 @@
         }
 
         function play(url) {
-            document.getElementById('video-frame').src = url;
+            const frame = document.getElementById('video-frame');
+            // Check if it's a direct m3u8 link (If yes, it might need a special player, but for now we try to load)
+            frame.src = url;
             document.getElementById('player-box').style.display = 'block';
             window.scrollTo(0,0);
         }
@@ -179,16 +166,8 @@
             history.pushState(null, null, window.location.pathname);
         });
         history.pushState(null, null, window.location.pathname);
-
         function closeExit() { document.getElementById('exit-overlay').style.display = 'none'; }
-        
-        function confirmExit() {
-            // Android WebView Exit Command
-            if (navigator.app) { navigator.app.exitApp(); } 
-            else if (navigator.device) { navigator.device.exitApp(); } 
-            else { window.close(); }
-        }
+        function confirmExit() { if (navigator.app) { navigator.app.exitApp(); } else { window.close(); } }
     </script>
 </body>
 </html>
-
