@@ -3,86 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cric Yoddha - Live</title>
+    <title>Cric Yoddha Live</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        :root { --primary: #3b82f6; --bg: #070b14; --card: #111827; --text: #f3f4f6; --border: rgba(255, 255, 255, 0.1); }
+        :root { --primary: #3b82f6; --bg: #070b14; --card: #111827; --text: #f3f4f6; --border: rgba(255, 255, 255, 0.1); --tg: #0088cc; }
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; width: 100vw; }
 
-        /* --- AUTH SCREEN --- */
-        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: var(--card); width: 100%; max-width: 400px; padding: 30px; border-radius: 30px; border: 1px solid var(--border); text-align: center; }
-        input { width: 100%; padding: 15px; margin-bottom: 12px; background: #0f172a; border: 1px solid var(--border); border-radius: 15px; color: #fff; outline: none; }
-        .btn-auth { width: 100%; padding: 16px; background: var(--primary); border: none; border-radius: 15px; color: #fff; font-weight: 700; cursor: pointer; }
-        #error-box { background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 12px; padding: 10px; border-radius: 10px; margin-bottom: 15px; display: none; }
+        /* ElevenLabs Style Auth Section */
+        #auth-screen { position: fixed; inset: 0; background: #fff; z-index: 5000; display: none; align-items: center; justify-content: center; padding: 20px; color: #000; }
+        .auth-card { width: 100%; max-width: 400px; text-align: center; }
+        .auth-card h1 { font-size: 28px; margin-bottom: 30px; font-weight: 700; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 16px; margin-bottom: 15px; }
+        .btn-auth { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-        /* --- EXIT POPUP (As per Screenshot) --- */
-        #exit-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(5px); }
-        .exit-box { background: #1e293b; width: 85%; max-width: 320px; padding: 35px 25px; border-radius: 30px; text-align: center; border: 1px solid var(--border); }
-        .exit-btns { display: flex; gap: 15px; margin-top: 25px; }
-        .btn-exit { flex: 1; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; border: none; }
-        .btn-yes { background: #ef4444; color: white; }
-        .btn-no { background: #334155; color: white; }
-
-        /* --- DASHBOARD --- */
+        /* Main Dashboard UI */
         #main-app { display: none; }
-        .header { height: 65px; background: var(--card); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--border); }
-        .container { padding: 15px; max-width: 600px; margin: auto; }
-        
-        /* Video Player Area Fix */
-        #player-box { 
-            width: 100%; aspect-ratio: 16/9; background: #000; 
-            border-radius: 20px; overflow: hidden; margin-bottom: 25px; 
-            display: none; border: 1px solid var(--border); 
-        }
-        #video-frame { width: 100%; height: 100%; border: none; }
+        .header { padding: 20px; font-weight: 700; font-size: 22px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .container { padding: 0 15px 20px 15px; max-width: 550px; margin: auto; }
 
-        .channel-item { background: var(--card); border-radius: 20px; padding: 15px; display: flex; align-items: center; margin-bottom: 12px; border: 1px solid var(--border); cursor: pointer; }
-        .channel-item img { width: 55px; height: 55px; border-radius: 12px; margin-right: 15px; object-fit: cover; }
+        /* Video Player Area */
+        #player-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 20px; display: none; border: 1px solid var(--border); }
+        video, iframe { width: 100%; height: 100%; border: none; }
+
+        /* Content section that hides permanently on play */
+        #content-wrapper { display: block; }
+        .featured-card { background: var(--card); border-radius: 25px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 20px; cursor: pointer; }
+        .thumb-area { position: relative; width: 100%; aspect-ratio: 16/9; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
+        .live-badge { position: absolute; top: 15px; left: 15px; background: #ef4444; color: white; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+        .play-btn { width: 50px; height: 50px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
+        .card-info { padding: 15px; }
+
+        /* Small Telegram Pop-up */
+        #tg-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 10001; }
+        .tg-card { background: var(--card); width: 80%; max-width: 300px; padding: 25px 20px; border-radius: 25px; text-align: center; border: 1px solid var(--tg); }
+        .btn-tg-join { display: block; background: var(--tg); color: #fff; text-decoration: none; padding: 12px; border-radius: 12px; font-weight: 700; margin-top: 15px; font-size: 14px; }
+        .btn-tg-already { background: transparent; border: none; color: #64748b; width: 100%; padding: 10px; font-weight: 600; margin-top: 5px; cursor: pointer; font-size: 12px; }
+
+        /* Exit Dialog */
+        #exit-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; }
+        .exit-box { background: #1e293b; width: 85%; max-width: 320px; padding: 30px; border-radius: 25px; text-align: center; border: 1px solid var(--border); }
     </style>
 </head>
 <body>
 
     <div id="exit-overlay">
         <div class="exit-box">
-            <h3 style="color:white; margin-bottom:10px;">Exit App?</h3>
-            <p style="color:#9ca3af;">Are you sure you want to close the application?</p>
-            <div class="exit-btns">
-                <button class="btn-exit btn-yes" onclick="confirmExit()">YES</button>
-                <button class="btn-exit btn-no" onclick="closeExit()">NO</button>
+            <h3 style="color:#fff;">Exit Application?</h3>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="confirmExit()" style="flex:1; padding:12px; background:#ef4444; color:white; border:none; border-radius:10px; font-weight:700;">YES</button>
+                <button onclick="closeExit()" style="flex:1; padding:12px; background:#334155; color:white; border:none; border-radius:10px; font-weight:700;">NO</button>
             </div>
         </div>
     </div>
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h2 id="auth-title">Welcome back</h2>
-            <div id="error-box"></div>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Password">
-            <button class="btn-auth" id="main-btn" onclick="handleAuth()">SIGN IN</button>
-            <p style="margin-top:20px; font-size:13px; color:#94a3b8;">
-                Don't have an account? <span onclick="toggleMode()" id="toggle-link" style="color:var(--primary); cursor:pointer; font-weight:600;">Sign Up</span>
-            </p>
+            <h1>Welcome back</h1>
+            <input type="email" id="email" placeholder="email@example.com">
+            <input type="password" id="password" placeholder="••••••••">
+            <button class="btn-auth" onclick="handleAuth()">Sign in</button>
+            <p style="margin-top:20px; font-size:14px; color:#4b5563;">Don't have an account? <span style="font-weight:700; cursor:pointer;" onclick="toggleMode()">Sign up</span></p>
         </div>
     </div>
 
     <div id="main-app">
-        <header class="header">
-            <div style="font-weight:700;">CRIC <span style="color:var(--primary)">YODDHA</span></div>
-            <i class="fas fa-sign-out-alt" onclick="logout()" style="color:#64748b; cursor:pointer;"></i>
-        </header>
+        <div class="header">CRIC <span style="color:var(--primary)">YODDHA</span></div>
         <div class="container">
-            <div id="player-box"><iframe id="video-frame" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe></div>
-            <div id="channel-list"></div>
+            <div id="player-box">
+                <video id="hls-video" controls autoplay playsinline style="display:none;"></video>
+                <iframe id="embed-frame" allowfullscreen allow="autoplay; encrypted-media" style="display:none;"></iframe>
+            </div>
+
+            <div id="content-wrapper">
+                <p style="color:#64748b; font-size:12px; margin-bottom:15px; font-weight:600;">FEATURED MATCH</p>
+                <div id="channel-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tg-overlay">
+        <div class="tg-card">
+            <i class="fab fa-telegram" style="font-size:40px; color:var(--tg); margin-bottom:10px;"></i>
+            <h2 style="color:#fff; font-size:18px;">Join Telegram</h2>
+            <p style="color:#94a3b8; font-size:13px;">More update live matches</p>
+            <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" class="btn-tg-join">JOIN NOW</a>
+            <button class="btn-tg-already" onclick="alreadyJoined()">Already Joined</button>
         </div>
     </div>
 
@@ -100,74 +114,88 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        let mode = "signin";
-
-        function toggleMode() {
-            mode = (mode === "signin") ? "signup" : "signin";
-            document.getElementById('auth-title').innerText = mode === "signin" ? "Welcome back" : "Create Account";
-            document.getElementById('main-btn').innerText = mode === "signin" ? "SIGN IN" : "SIGN UP";
-            document.getElementById('toggle-link').innerText = mode === "signin" ? "Sign Up" : "Sign In";
-        }
-
-        async function handleAuth() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
-            if(!e || !p) return;
-
-            if(mode === "signin") {
-                auth.signInWithEmailAndPassword(e, p).catch(err => {
-                    if(err.code === "auth/user-not-found") showError("Account not found! Please Sign Up first.");
-                    else showError("Invalid details.");
-                });
-            } else {
-                auth.createUserWithEmailAndPassword(e, p).catch(err => showError(err.message));
-            }
-        }
-
-        function showError(m) { const b = document.getElementById('error-box'); b.innerText = m; b.style.display = 'block'; }
-        function logout() { auth.signOut(); }
+        let hls;
 
         auth.onAuthStateChanged(user => {
-            if(user) {
+            if (user) {
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
-                loadChannels();
+                loadData();
             } else {
                 document.getElementById('auth-screen').style.display = 'flex';
                 document.getElementById('main-app').style.display = 'none';
             }
         });
 
-        function loadChannels() {
+        function handleAuth() {
+            const e = document.getElementById('email').value, p = document.getElementById('password').value;
+            auth.signInWithEmailAndPassword(e, p).catch(() => auth.createUserWithEmailAndPassword(e, p));
+        }
+
+        function loadData() {
             db.ref('channels').on('value', snap => {
                 const list = document.getElementById('channel-list');
                 list.innerHTML = "";
                 snap.forEach(child => {
                     const d = child.val();
-                    list.innerHTML += `<div class="channel-item" onclick="play('${d.url}')">
-                        <img src="${d.logo}">
-                        <div><b>${d.name}</b><br><small style="color:#94a3b8">${d.title}</small></div>
-                    </div>`;
+                    list.innerHTML += `
+                        <div class="featured-card" onclick="playMatch('${d.url}')">
+                            <div class="thumb-area" style="background-image: url('${d.logo}')">
+                                <div class="live-badge">LIVE</div>
+                                <div class="play-btn"><i class="fas fa-play"></i></div>
+                            </div>
+                            <div class="card-info">
+                                <p style="color:var(--primary); font-size:11px; font-weight:700;">${d.name}</p>
+                                <h3 style="margin-top:5px; color:#fff;">${d.title}</h3>
+                            </div>
+                        </div>`;
                 });
             });
         }
 
-        function play(url) {
-            const frame = document.getElementById('video-frame');
-            // Check if it's a direct m3u8 link (If yes, it might need a special player, but for now we try to load)
-            frame.src = url;
-            document.getElementById('player-box').style.display = 'block';
-            window.scrollTo(0,0);
+        function playMatch(url) {
+            const v = document.getElementById('hls-video'), f = document.getElementById('embed-frame'), box = document.getElementById('player-box');
+            box.style.display = 'block';
+            
+            // --- THE PERMANENT FIX ---
+            // Jaise hi match play hoga, niche ki thumbnails hamesha ke liye hide ho jayengi
+            document.getElementById('content-wrapper').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (url.includes('.m3u8')) {
+                f.style.display = 'none'; v.style.display = 'block';
+                if (Hls.isSupported()) {
+                    if (hls) hls.destroy();
+                    hls = new Hls(); hls.loadSource(url); hls.attachMedia(v);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => v.play());
+                } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
+                    v.src = url; v.play();
+                }
+            } else {
+                if (hls) hls.destroy();
+                v.style.display = 'none'; f.style.display = 'block'; f.src = url;
+            }
+
+            setTimeout(() => {
+                document.getElementById('tg-overlay').style.display = 'flex';
+            }, 10000);
         }
 
-        // EXIT LOGIC
-        window.addEventListener('popstate', function() {
+        // --- UPDATED POPUP CLOSING LOGIC ---
+        function alreadyJoined() {
+            // Popup band hone par bhi niche thumbnails nahi aayengi
+            document.getElementById('tg-overlay').style.display = 'none';
+            // Yeh line ensure karegi ki niche ka section hide hi rahe jaisa aapne screenshot me dikhaya hai
+            document.getElementById('content-wrapper').style.display = 'none';
+        }
+
+        window.addEventListener('popstate', function () {
             document.getElementById('exit-overlay').style.display = 'flex';
             history.pushState(null, null, window.location.pathname);
         });
         history.pushState(null, null, window.location.pathname);
         function closeExit() { document.getElementById('exit-overlay').style.display = 'none'; }
-        function confirmExit() { if (navigator.app) { navigator.app.exitApp(); } else { window.close(); } }
+        function confirmExit() { if (navigator.app) navigator.app.exitApp(); else window.close(); }
     </script>
 </body>
 </html>
