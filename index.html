@@ -3,108 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cric Yoddha Live</title>
+    <title>Cric Yoddha - Final Fix</title>
     
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        :root { --primary: #3b82f6; --bg: #070b14; --card: #111827; --text: #f3f4f6; --border: rgba(255, 255, 255, 0.1); --tg: #0088cc; }
+        :root { --primary: #3b82f6; --bg: #070b14; --card: #111827; --text: #f3f4f6; --border: rgba(255, 255, 255, 0.1); }
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
         body { background: var(--bg); color: var(--text); overflow-x: hidden; width: 100vw; }
 
-        /* --- ElevenLabs Style Auth Section --- */
+        /* Auth Screen */
         #auth-screen { position: fixed; inset: 0; background: #fff; z-index: 5000; display: none; align-items: center; justify-content: center; padding: 20px; color: #000; }
         .auth-card { width: 100%; max-width: 400px; text-align: center; }
-        .auth-card h1 { font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -1px; }
-        .auth-card p.subtitle { color: #666; font-size: 14px; margin-bottom: 30px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 16px; margin-bottom: 15px; }
-        .btn-auth { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px; }
-        .toggle-text { margin-top: 20px; font-size: 14px; color: #4b5563; }
-        .toggle-text span { font-weight: 700; cursor: pointer; color: #000; text-decoration: underline; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; margin-bottom: 15px; }
+        .btn-auth { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-        /* --- Main Dashboard --- */
+        /* Header */
         #main-app { display: none; }
-        .header { padding: 20px; font-weight: 700; font-size: 22px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
-        .container { padding: 0 15px 20px 15px; max-width: 550px; margin: auto; }
+        .header { padding: 25px 20px; font-weight: 800; font-size: 26px; color: #fff; }
+        .header span { color: var(--primary); }
+        .container { padding: 0 15px; max-width: 550px; margin: auto; }
 
-        /* Player Section */
-        #player-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 20px; display: none; border: 1px solid var(--border); }
-        video, iframe { width: 100%; height: 100%; border: none; }
+        /* Video Player Wrapper */
+        #player-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 25px; display: none; border: 1px solid var(--border); position: relative; }
+        video, iframe { width: 100%; height: 100%; border: none; position: absolute; top:0; left:0; }
 
-        /* Content (Hides when playing) */
-        #content-wrapper { display: block; }
-        .featured-card { background: var(--card); border-radius: 25px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 20px; cursor: pointer; }
-        .thumb-area { position: relative; width: 100%; aspect-ratio: 16/9; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
-        .play-btn { width: 50px; height: 50px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
-        .card-info { padding: 15px; }
+        /* Search & Sections */
+        .search-container { margin-bottom: 15px; }
+        .search-bar { width: 100%; padding: 12px 18px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; color: #fff; outline: none; font-size: 14px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; text-align: center; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .tab.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
 
-        /* Small Telegram Pop-up */
-        #tg-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 10001; }
-        .tg-card { background: var(--card); width: 80%; max-width: 300px; padding: 25px 20px; border-radius: 25px; text-align: center; border: 1px solid var(--tg); }
-        .btn-tg-join { display: block; background: var(--tg); color: #fff; text-decoration: none; padding: 12px; border-radius: 12px; font-weight: 700; margin-top: 15px; font-size: 14px; }
-        .btn-tg-already { background: transparent; border: none; color: #64748b; width: 100%; padding: 10px; font-weight: 600; margin-top: 5px; cursor: pointer; font-size: 12px; }
-
-        /* Exit Popup */
-        #exit-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; }
-        .exit-box { background: #1e293b; width: 85%; max-width: 320px; padding: 30px; border-radius: 25px; text-align: center; border: 1px solid var(--border); }
+        /* Match Cards */
+        .match-card { background: var(--card); border-radius: 25px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 20px; cursor: pointer; }
+        .thumb { position: relative; width: 100%; aspect-ratio: 16/9; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
+        .play-btn { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; }
+        .details { padding: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="exit-overlay">
-        <div class="exit-box">
-            <h3 style="color:#fff;">Exit Application?</h3>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button onclick="confirmExit()" style="flex:1; padding:12px; background:#ef4444; color:white; border:none; border-radius:10px; font-weight:700;">YES</button>
-                <button onclick="closeExit()" style="flex:1; padding:12px; background:#334155; color:white; border:none; border-radius:10px; font-weight:700;">NO</button>
-            </div>
-        </div>
-    </div>
-
     <div id="auth-screen">
         <div class="auth-card">
-            <h1 id="auth-title">Welcome back</h1>
-            <p class="subtitle" id="auth-subtitle">Please enter your details to sign in.</p>
-            
-            <input type="email" id="email" placeholder="Email Address">
+            <h1>Cric Yoddha</h1>
+            <input type="email" id="email" placeholder="Email">
             <input type="password" id="password" placeholder="Password">
-            
-            <button class="btn-auth" id="auth-btn" onclick="handleAuth()">Sign in</button>
-            
-            <p class="toggle-text" id="toggle-wrapper">
-                Don't have an account? <span onclick="toggleAuthMode()">Sign up</span>
-            </p>
+            <button class="btn-auth" onclick="handleAuth()">Sign in</button>
         </div>
     </div>
 
     <div id="main-app">
-        <div class="header">CRIC <span style="color:var(--primary)">YODDHA</span></div>
+        <div class="header">CRIC <span>YODDHA</span></div>
         <div class="container">
-            <div id="player-box">
-                <video id="hls-video" controls autoplay playsinline style="display:none;"></video>
-                <iframe id="embed-frame" allowfullscreen allow="autoplay" style="display:none;"></iframe>
+            <div id="player-wrapper">
+                <video id="plyr-video" playsinline controls style="display:none;"></video>
+                <iframe id="web-frame" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-presentation allow-forms" style="display:none;"></iframe>
             </div>
 
             <div id="content-wrapper">
-                <p style="color:#64748b; font-size:12px; margin-bottom:15px; font-weight:600;">FEATURED MATCH</p>
-                <div id="channel-list"></div>
+                <div class="search-container">
+                    <input type="text" class="search-bar" id="search-bar" placeholder="Search Live TV or Movies..." oninput="renderList()">
+                </div>
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('live', this)">LIVE TV</div>
+                    <div class="tab" onclick="switchTab('movie', this)">MOVIES</div>
+                </div>
+                <div id="list-container"></div>
             </div>
-        </div>
-    </div>
-
-    <div id="tg-overlay">
-        <div class="tg-card">
-            <i class="fab fa-telegram" style="font-size:40px; color:var(--tg); margin-bottom:10px;"></i>
-            <h2 style="color:#fff; font-size:18px;">Join Telegram</h2>
-            <p style="color:#94a3b8; font-size:13px;">More update live matches</p>
-            <a href="https://t.me/+rwZKMV0-L8wyOTll" target="_blank" class="btn-tg-join">JOIN NOW</a>
-            <button class="btn-tg-already" onclick="alreadyJoined()">Already Joined</button>
         </div>
     </div>
 
@@ -121,107 +95,95 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
-
-        let isSignUpMode = false;
-        let hls;
+        
+        let allData = [];
+        let activeTab = 'live';
+        let plyrPlayer;
 
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
-                loadData();
+                fetchData();
             } else {
                 document.getElementById('auth-screen').style.display = 'flex';
                 document.getElementById('main-app').style.display = 'none';
             }
         });
 
-        // --- AUTH TOGGLE LOGIC ---
-        function toggleAuthMode() {
-            isSignUpMode = !isSignUpMode;
-            const title = document.getElementById('auth-title');
-            const subtitle = document.getElementById('auth-subtitle');
-            const btn = document.getElementById('auth-btn');
-            const toggleWrapper = document.getElementById('toggle-wrapper');
-
-            if (isSignUpMode) {
-                title.innerText = "Create account";
-                subtitle.innerText = "Join Cric Yoddha today.";
-                btn.innerText = "Sign up";
-                toggleWrapper.innerHTML = `Already have an account? <span onclick="toggleAuthMode()">Sign in</span>`;
-            } else {
-                title.innerText = "Welcome back";
-                subtitle.innerText = "Please enter your details to sign in.";
-                btn.innerText = "Sign in";
-                toggleWrapper.innerHTML = `Don't have an account? <span onclick="toggleAuthMode()">Sign up</span>`;
-            }
-        }
-
         function handleAuth() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
-            if(!e || !p) { alert("Please fill all fields"); return; }
-
-            if (isSignUpMode) {
-                auth.createUserWithEmailAndPassword(e, p).catch(err => alert(err.message));
-            } else {
-                auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
-            }
+            const e = document.getElementById('email').value, p = document.getElementById('password').value;
+            auth.signInWithEmailAndPassword(e, p).catch(() => auth.createUserWithEmailAndPassword(e, p));
         }
 
-        function loadData() {
+        function fetchData() {
             db.ref('channels').on('value', snap => {
-                const list = document.getElementById('channel-list');
-                list.innerHTML = "";
-                snap.forEach(child => {
-                    const d = child.val();
-                    list.innerHTML += `
-                        <div class="featured-card" onclick="playMatch('${d.url}')">
-                            <div class="thumb-area" style="background-image: url('${d.logo}')">
-                                <div class="play-btn"><i class="fas fa-play"></i></div>
-                            </div>
-                            <div class="card-info">
-                                <p style="color:var(--primary); font-size:11px; font-weight:700;">${d.name}</p>
-                                <h3 style="color:#fff;">${d.title}</h3>
-                            </div>
-                        </div>`;
-                });
+                allData = [];
+                snap.forEach(c => allData.push({id: c.key, ...c.val()}));
+                renderList();
             });
         }
 
+        function switchTab(t, el) {
+            activeTab = t;
+            document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+            el.classList.add('active');
+            renderList();
+        }
+
+        function renderList() {
+            const list = document.getElementById('list-container');
+            const search = document.getElementById('search-bar').value.toLowerCase();
+            list.innerHTML = "";
+            const filtered = allData.filter(d => (d.type || 'live') === activeTab && d.title.toLowerCase().includes(search));
+            filtered.forEach(d => {
+                list.innerHTML += `
+                    <div class="match-card" onclick="playMatch('${d.url}')">
+                        <div class="thumb" style="background-image: url('${d.logo}')">
+                            <div class="play-btn"><i class="fas fa-play"></i></div>
+                        </div>
+                        <div class="details">
+                            <p style="color:var(--primary); font-size:11px; font-weight:700;">${d.name}</p>
+                            <h3 style="margin-top:5px; font-size:16px;">${d.title}</h3>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // --- THE FIXED LOGIC ---
         function playMatch(url) {
-            document.getElementById('player-box').style.display = 'block';
+            const v = document.getElementById('plyr-video');
+            const f = document.getElementById('web-frame');
+            const box = document.getElementById('player-wrapper');
+            
+            box.style.display = 'block';
             document.getElementById('content-wrapper').style.display = 'none';
-            const v = document.getElementById('hls-video'), f = document.getElementById('embed-frame');
+            window.scrollTo({top: 0, behavior: 'smooth'});
 
+            if (plyrPlayer) plyrPlayer.destroy();
+
+            // Detect link type
             if (url.includes('.m3u8')) {
-                f.style.display = 'none'; v.style.display = 'block';
+                f.style.display = 'none'; f.src = "";
+                v.style.display = 'block';
                 if (Hls.isSupported()) {
-                    if (hls) hls.destroy();
-                    hls = new Hls(); hls.loadSource(url); hls.attachMedia(v);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => v.play());
-                } else { v.src = url; v.play(); }
+                    const hls = new Hls();
+                    hls.loadSource(url);
+                    hls.attachMedia(v);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        plyrPlayer = new Plyr(v, {autoplay: true});
+                        v.play();
+                    });
+                }
             } else {
-                if (hls) hls.destroy();
-                v.style.display = 'none'; f.style.display = 'block'; f.src = url;
+                // For GitHub/Web page players
+                v.style.display = 'none'; v.src = "";
+                f.style.display = 'block';
+                f.src = url;
             }
-
-            setTimeout(() => { document.getElementById('tg-overlay').style.display = 'flex'; }, 10000);
         }
-
-        function alreadyJoined() {
-            document.getElementById('tg-overlay').style.display = 'none';
-            document.getElementById('content-wrapper').style.display = 'none';
-        }
-
-        window.addEventListener('popstate', function () {
-            document.getElementById('exit-overlay').style.display = 'flex';
-            history.pushState(null, null, window.location.pathname);
-        });
-        history.pushState(null, null, window.location.pathname);
-        function closeExit() { document.getElementById('exit-overlay').style.display = 'none'; }
-        function confirmExit() { if (navigator.app) navigator.app.exitApp(); else window.close(); }
     </script>
 </body>
 </html>
+
 
