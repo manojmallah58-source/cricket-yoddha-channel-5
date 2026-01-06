@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cric Yoddha - Final Fix</title>
+    <title>Cric Yoddha - Final</title>
     
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,8 +23,10 @@
         /* Auth Screen */
         #auth-screen { position: fixed; inset: 0; background: #fff; z-index: 5000; display: none; align-items: center; justify-content: center; padding: 20px; color: #000; }
         .auth-card { width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; margin-bottom: 15px; font-size: 16px; }
         .btn-auth { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .toggle-link { margin-top: 20px; font-size: 14px; color: #555; cursor: pointer; }
+        .toggle-link b { color: #000; }
 
         /* Header */
         #main-app { display: none; }
@@ -32,32 +34,35 @@
         .header span { color: var(--primary); }
         .container { padding: 0 15px; max-width: 550px; margin: auto; }
 
-        /* Video Player Wrapper */
+        /* Full Screen Support Player */
         #player-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 25px; display: none; border: 1px solid var(--border); position: relative; }
         video, iframe { width: 100%; height: 100%; border: none; position: absolute; top:0; left:0; }
 
-        /* Search & Sections */
+        /* Tabs & Search */
         .search-container { margin-bottom: 15px; }
-        .search-bar { width: 100%; padding: 12px 18px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; color: #fff; outline: none; font-size: 14px; }
+        .search-bar { width: 100%; padding: 12px 18px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; color: #fff; outline: none; }
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; text-align: center; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .tab { flex: 1; padding: 12px; background: var(--card); border-radius: 12px; text-align: center; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); }
         .tab.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
 
-        /* Match Cards */
+        /* Grid */
         .match-card { background: var(--card); border-radius: 25px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 20px; cursor: pointer; }
         .thumb { position: relative; width: 100%; aspect-ratio: 16/9; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
-        .play-btn { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; }
-        .details { padding: 15px; }
+        .play-btn { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h1>Cric Yoddha</h1>
-            <input type="email" id="email" placeholder="Email">
+            <h1 id="auth-title">Welcome Back</h1>
+            <p id="auth-desc" style="margin-bottom:20px; color:#666;">Sign in to continue</p>
+            <input type="email" id="email" placeholder="Email Address">
             <input type="password" id="password" placeholder="Password">
-            <button class="btn-auth" onclick="handleAuth()">Sign in</button>
+            <button class="btn-auth" id="auth-btn" onclick="handleAuth()">Sign In</button>
+            <div class="toggle-link" id="auth-toggle" onclick="toggleAuth()">
+                Don't have an account? <b>Sign Up</b>
+            </div>
         </div>
     </div>
 
@@ -66,7 +71,7 @@
         <div class="container">
             <div id="player-wrapper">
                 <video id="plyr-video" playsinline controls style="display:none;"></video>
-                <iframe id="web-frame" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-presentation allow-forms" style="display:none;"></iframe>
+                <iframe id="web-frame" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; encrypted-media; fullscreen" style="display:none;"></iframe>
             </div>
 
             <div id="content-wrapper">
@@ -98,8 +103,10 @@
         
         let allData = [];
         let activeTab = 'live';
+        let isLoginMode = true;
         let plyrPlayer;
 
+        // Auth Logic
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('auth-screen').style.display = 'none';
@@ -111,11 +118,20 @@
             }
         });
 
-        function handleAuth() {
-            const e = document.getElementById('email').value, p = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(e, p).catch(() => auth.createUserWithEmailAndPassword(e, p));
+        function toggleAuth() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').innerText = isLoginMode ? "Welcome Back" : "Create Account";
+            document.getElementById('auth-btn').innerText = isLoginMode ? "Sign In" : "Sign Up";
+            document.getElementById('auth-toggle').innerHTML = isLoginMode ? "Don't have an account? <b>Sign Up</b>" : "Already have an account? <b>Sign In</b>";
         }
 
+        function handleAuth() {
+            const e = document.getElementById('email').value, p = document.getElementById('password').value;
+            if(isLoginMode) auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
+            else auth.createUserWithEmailAndPassword(e, p).catch(err => alert(err.message));
+        }
+
+        // Data Logic
         function fetchData() {
             db.ref('channels').on('value', snap => {
                 allData = [];
@@ -142,15 +158,12 @@
                         <div class="thumb" style="background-image: url('${d.logo}')">
                             <div class="play-btn"><i class="fas fa-play"></i></div>
                         </div>
-                        <div class="details">
-                            <p style="color:var(--primary); font-size:11px; font-weight:700;">${d.name}</p>
-                            <h3 style="margin-top:5px; font-size:16px;">${d.title}</h3>
-                        </div>
+                        <div style="padding:15px;"><h3>${d.title}</h3></div>
                     </div>`;
             });
         }
 
-        // --- THE FIXED LOGIC ---
+        // Player Logic Fix
         function playMatch(url) {
             const v = document.getElementById('plyr-video');
             const f = document.getElementById('web-frame');
@@ -158,11 +171,10 @@
             
             box.style.display = 'block';
             document.getElementById('content-wrapper').style.display = 'none';
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            window.scrollTo(0,0);
 
             if (plyrPlayer) plyrPlayer.destroy();
 
-            // Detect link type
             if (url.includes('.m3u8')) {
                 f.style.display = 'none'; f.src = "";
                 v.style.display = 'block';
@@ -171,15 +183,14 @@
                     hls.loadSource(url);
                     hls.attachMedia(v);
                     hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                        plyrPlayer = new Plyr(v, {autoplay: true});
+                        plyrPlayer = new Plyr(v, {fullscreen: { enabled: true, fallback: true }});
                         v.play();
                     });
                 }
             } else {
-                // For GitHub/Web page players
                 v.style.display = 'none'; v.src = "";
                 f.style.display = 'block';
-                f.src = url;
+                f.src = url; // GitHub/Web link
             }
         }
     </script>
