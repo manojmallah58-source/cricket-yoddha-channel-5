@@ -27,7 +27,6 @@
       background: #000;  
       object-fit: contain;  
     }  
-    /* Spinner Hidden for clean look */
     .shaka-spinner-container { display: none !important; }  
   </style>  
 </head>  
@@ -49,7 +48,6 @@
       const container = document.querySelector('.shaka-video-container');  
       const player = new shaka.Player(video);  
       
-      // UI Configuration
       const ui = new shaka.ui.Overlay(player, container, video);  
       ui.configure({  
         controlPanelElements: [  
@@ -63,14 +61,14 @@
         }  
       });  
   
-      // ✅ New Stream URL Applied
-      const streamUrl = "https://a201aivottlinear-a.akamaihd.net/OTTB/lhr-nitro/live/dash/enc/dn7vupw4sj/out/v1/d7130f460d41486ea7e8e3eb45f0522f/cenc.mpd?amznDtid=AOAGZA014O5RE&encoding=segmentBase";  
+      // ✅ Updated Stream URL with new path
+      const streamUrl = "https://a65live-pv-ta-amazon.akamaized.net/syd-nitro/live/clients/dash/enc/ryfoddshmd/out/v1/2298afadf64943adb0b44dc540ace1ce/cenc.mpd?amznDtid=AOAGZA014O5RE&encoding=segmentBase|drmScheme=clearkey";  
       
       player.configure({  
         drm: {  
           clearKeys: {  
-            // ✅ New DRM Keys Applied
-            "9c8743426487c9074b60b456dda93e4d": "643e4f68ec9e3309b7e1e61b95bec85d"  
+            // ✅ Updated DRM License Keys from your URL
+            "cd2266bd1085a92143007be26296daeb": "1a21a3cbb8e8062c3a82135a47389c2b"  
           }  
         },  
         streaming: {  
@@ -90,13 +88,12 @@
   
       try {  
         await player.load(streamUrl);  
-        console.log("Stream successfully loaded with new keys!");  
+        console.log("Stream for Cricket Yoddha successfully loaded!");  
       } catch (error) {  
         console.error('Error loading stream:', error);  
       }  
     }  
 
-    // Ensure initialization happens correctly
     document.addEventListener('shaka-ui-loaded', initPlayer);  
     document.addEventListener('DOMContentLoaded', () => { if (!window.shaka) initPlayer(); });
   </script>  
