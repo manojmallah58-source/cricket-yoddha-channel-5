@@ -1,200 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cric Yoddha - Final</title>
-    
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<!DOCTYPE html>  
+<html>  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>Prime By Cricket Yoddha</title>     
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
+  <style>  
+   * { margin: 0; padding: 0; box-sizing: border-box; }  
+    html, body {  
+      background: #000;  
+      height: 100vh;  
+      width: 100vw;  
+      overflow: hidden;  
+      font-family: system-ui, -apple-system, sans-serif;  
+    }  
+    .shaka-video-container {  
+      position: absolute;  
+      inset: 0;  
+      width: 100%;  
+      height: 100%;  
+    }  
+    video {  
+      width: 100%;  
+      height: 100%;  
+      background: #000;  
+      object-fit: contain;  
+    }  
+    /* Spinner Hidden for clean look */
+    .shaka-spinner-container { display: none !important; }  
+  </style>  
+</head>  
+<body>  
+  <div class="shaka-video-container" data-shaka-player>  
+    <video id="video" autoplay muted playsinline preload="metadata" poster="https://i.ibb.co/8DHnQ6f8/image-search-1770442885382.jpg"></video>  
+  </div>  
+  
+  <script>  
+    async function initPlayer() {  
+      shaka.polyfill.installAll();  
+  
+      if (!shaka.Player.isBrowserSupported()) {  
+        console.error('Browser not supported!');  
+        return;  
+      }  
+  
+      const video = document.getElementById('video');  
+      const container = document.querySelector('.shaka-video-container');  
+      const player = new shaka.Player(video);  
+      
+      // UI Configuration
+      const ui = new shaka.ui.Overlay(player, container, video);  
+      ui.configure({  
+        controlPanelElements: [  
+          'play_pause', 'time_and_duration', 'mute', 'volume',  
+          'spacer', 'quality', 'picture_in_picture', 'fullscreen'  
+        ],  
+        seekBarColors: {  
+          base: 'rgba(255, 255, 0, 0.3)',  
+          buffered: 'rgba(255, 255, 0, 0.5)',  
+          played: 'rgb(255, 255, 0)'  
+        }  
+      });  
+  
+      // ✅ New Stream URL Applied
+      const streamUrl = "https://a201aivottlinear-a.akamaihd.net/OTTB/lhr-nitro/live/dash/enc/dn7vupw4sj/out/v1/d7130f460d41486ea7e8e3eb45f0522f/cenc.mpd?amznDtid=AOAGZA014O5RE&encoding=segmentBase";  
+      
+      player.configure({  
+        drm: {  
+          clearKeys: {  
+            // ✅ New DRM Keys Applied
+            "9c8743426487c9074b60b456dda93e4d": "643e4f68ec9e3309b7e1e61b95bec85d"  
+          }  
+        },  
+        streaming: {  
+          lowLatencyMode: true,  
+          jumpLargeGaps: true,
+          bufferingGoal: 10,
+          rebufferingGoal: 2,
+          retryParameters: {
+            maxAttempts: 5,
+            baseDelay: 1000,
+            backoffFactor: 2,
+          }
+        }  
+      });  
+  
+      player.addEventListener('error', (e) => console.error('Shaka Error:', e.detail));  
+  
+      try {  
+        await player.load(streamUrl);  
+        console.log("Stream successfully loaded with new keys!");  
+      } catch (error) {  
+        console.error('Error loading stream:', error);  
+      }  
+    }  
 
-    <style>
-        :root { --primary: #3b82f6; --bg: #070b14; --card: #111827; --text: #f3f4f6; --border: rgba(255, 255, 255, 0.1); }
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; width: 100vw; }
-
-        /* Auth Screen */
-        #auth-screen { position: fixed; inset: 0; background: #fff; z-index: 5000; display: none; align-items: center; justify-content: center; padding: 20px; color: #000; }
-        .auth-card { width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; margin-bottom: 15px; font-size: 16px; }
-        .btn-auth { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-        .toggle-link { margin-top: 20px; font-size: 14px; color: #555; cursor: pointer; }
-        .toggle-link b { color: #000; }
-
-        /* Header */
-        #main-app { display: none; }
-        .header { padding: 25px 20px; font-weight: 800; font-size: 26px; color: #fff; }
-        .header span { color: var(--primary); }
-        .container { padding: 0 15px; max-width: 550px; margin: auto; }
-
-        /* Full Screen Support Player */
-        #player-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 25px; display: none; border: 1px solid var(--border); position: relative; }
-        video, iframe { width: 100%; height: 100%; border: none; position: absolute; top:0; left:0; }
-
-        /* Tabs & Search */
-        .search-container { margin-bottom: 15px; }
-        .search-bar { width: 100%; padding: 12px 18px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; color: #fff; outline: none; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 12px; background: var(--card); border-radius: 12px; text-align: center; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); }
-        .tab.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
-
-        /* Grid */
-        .match-card { background: var(--card); border-radius: 25px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 20px; cursor: pointer; }
-        .thumb { position: relative; width: 100%; aspect-ratio: 16/9; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
-        .play-btn { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
-    </style>
-</head>
-<body>
-
-    <div id="auth-screen">
-        <div class="auth-card">
-            <h1 id="auth-title">Welcome Back</h1>
-            <p id="auth-desc" style="margin-bottom:20px; color:#666;">Sign in to continue</p>
-            <input type="email" id="email" placeholder="Email Address">
-            <input type="password" id="password" placeholder="Password">
-            <button class="btn-auth" id="auth-btn" onclick="handleAuth()">Sign In</button>
-            <div class="toggle-link" id="auth-toggle" onclick="toggleAuth()">
-                Don't have an account? <b>Sign Up</b>
-            </div>
-        </div>
-    </div>
-
-    <div id="main-app">
-        <div class="header">CRIC <span>YODDHA</span></div>
-        <div class="container">
-            <div id="player-wrapper">
-                <video id="plyr-video" playsinline controls style="display:none;"></video>
-                <iframe id="web-frame" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; encrypted-media; fullscreen" style="display:none;"></iframe>
-            </div>
-
-            <div id="content-wrapper">
-                <div class="search-container">
-                    <input type="text" class="search-bar" id="search-bar" placeholder="Search Live TV or Movies..." oninput="renderList()">
-                </div>
-                <div class="tabs">
-                    <div class="tab active" onclick="switchTab('live', this)">LIVE TV</div>
-                    <div class="tab" onclick="switchTab('movie', this)">MOVIES</div>
-                </div>
-                <div id="list-container"></div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyC6a6kH-_7jFTEEIhMTwEOLKMLj7qmtLgQ",
-            authDomain: "cric-yoddha.firebaseapp.com",
-            databaseURL: "https://cric-yoddha-default-rtdb.firebaseio.com",
-            projectId: "cric-yoddha",
-            storageBucket: "cric-yoddha.firebasestorage.app",
-            messagingSenderId: "340220638066",
-            appId: "1:340220638066:web:1360dc2c34e3b8b7a263eb"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
-        
-        let allData = [];
-        let activeTab = 'live';
-        let isLoginMode = true;
-        let plyrPlayer;
-
-        // Auth Logic
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('main-app').style.display = 'block';
-                fetchData();
-            } else {
-                document.getElementById('auth-screen').style.display = 'flex';
-                document.getElementById('main-app').style.display = 'none';
-            }
-        });
-
-        function toggleAuth() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').innerText = isLoginMode ? "Welcome Back" : "Create Account";
-            document.getElementById('auth-btn').innerText = isLoginMode ? "Sign In" : "Sign Up";
-            document.getElementById('auth-toggle').innerHTML = isLoginMode ? "Don't have an account? <b>Sign Up</b>" : "Already have an account? <b>Sign In</b>";
-        }
-
-        function handleAuth() {
-            const e = document.getElementById('email').value, p = document.getElementById('password').value;
-            if(isLoginMode) auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
-            else auth.createUserWithEmailAndPassword(e, p).catch(err => alert(err.message));
-        }
-
-        // Data Logic
-        function fetchData() {
-            db.ref('channels').on('value', snap => {
-                allData = [];
-                snap.forEach(c => allData.push({id: c.key, ...c.val()}));
-                renderList();
-            });
-        }
-
-        function switchTab(t, el) {
-            activeTab = t;
-            document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-            el.classList.add('active');
-            renderList();
-        }
-
-        function renderList() {
-            const list = document.getElementById('list-container');
-            const search = document.getElementById('search-bar').value.toLowerCase();
-            list.innerHTML = "";
-            const filtered = allData.filter(d => (d.type || 'live') === activeTab && d.title.toLowerCase().includes(search));
-            filtered.forEach(d => {
-                list.innerHTML += `
-                    <div class="match-card" onclick="playMatch('${d.url}')">
-                        <div class="thumb" style="background-image: url('${d.logo}')">
-                            <div class="play-btn"><i class="fas fa-play"></i></div>
-                        </div>
-                        <div style="padding:15px;"><h3>${d.title}</h3></div>
-                    </div>`;
-            });
-        }
-
-        // Player Logic Fix
-        function playMatch(url) {
-            const v = document.getElementById('plyr-video');
-            const f = document.getElementById('web-frame');
-            const box = document.getElementById('player-wrapper');
-            
-            box.style.display = 'block';
-            document.getElementById('content-wrapper').style.display = 'none';
-            window.scrollTo(0,0);
-
-            if (plyrPlayer) plyrPlayer.destroy();
-
-            if (url.includes('.m3u8')) {
-                f.style.display = 'none'; f.src = "";
-                v.style.display = 'block';
-                if (Hls.isSupported()) {
-                    const hls = new Hls();
-                    hls.loadSource(url);
-                    hls.attachMedia(v);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                        plyrPlayer = new Plyr(v, {fullscreen: { enabled: true, fallback: true }});
-                        v.play();
-                    });
-                }
-            } else {
-                v.style.display = 'none'; v.src = "";
-                f.style.display = 'block';
-                f.src = url; // GitHub/Web link
-            }
-        }
-    </script>
-</body>
+    // Ensure initialization happens correctly
+    document.addEventListener('shaka-ui-loaded', initPlayer);  
+    document.addEventListener('DOMContentLoaded', () => { if (!window.shaka) initPlayer(); });
+  </script>  
+</body>  
 </html>
-
-
