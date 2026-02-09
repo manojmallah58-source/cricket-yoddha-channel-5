@@ -63,21 +63,20 @@
         }  
       });  
   
-      // ✅ Updated New Stream URL
-      const streamUrl = "https://ottb.live.cf.ww.aiv-cdn.net/sin-nitro/live/dash/enc/dn7vupw4sj/out/v1/d7130f460d41486ea7e8e3eb45f0522f/cenc.mpd";  
+      // ✅ Updated Stream URL from your request
+      const streamUrl = "https://a120live-pv-ta-amazon.akamaized.net/syd-nitro/live/clients/dash/enc/83taeafait/out/v1/8f460e2902ee422e9ee8229e6de25719/cenc.mpd";  
       
       player.configure({  
         drm: {  
           clearKeys: {  
-            // ✅ Updated New DRM Keys
-            "d0df0607d2c9f7f175a1b68b2dd74af9": "3b9bceeb5dd81d6e906217d27f831cee"  
+            // ✅ Updated DRM Keys from your request
+            "ed76c18710d621a87c89dedc7c13019f": "7241c82fe48525a9dc6be6d7bb86611f"  
           }  
         },  
         streaming: {  
           lowLatencyMode: true,  
           jumpLargeGaps: true,
           bufferingGoal: 10,
-          manifestUpdatePeriod: 2,
           retryParameters: {
             maxAttempts: 5,
             baseDelay: 1000,
@@ -87,23 +86,27 @@
       });  
   
       player.addEventListener('error', (e) => console.error('Shaka Error:', e.detail));  
+
+      // Auto-unmute on first click
+      video.addEventListener('click', () => {
+        if (video.muted) video.muted = false;
+      });
   
       try {  
         await player.load(streamUrl);  
-        console.log("New Stream successfully loaded!");  
+        console.log("Stream successfully loaded!");  
       } catch (error) {  
         console.error('Error loading stream:', error);  
       }  
     }  
 
-    // ऑटो-स्टार्ट के लिए बेहतर तरीका
+    // Secure initialization
     if (document.readyState === 'complete') {
-      initPlayer();
+        initPlayer();
     } else {
-      document.addEventListener('shaka-ui-loaded', initPlayer);  
-      document.addEventListener('DOMContentLoaded', () => { if (!window.shaka) initPlayer(); });
+        document.addEventListener('shaka-ui-loaded', initPlayer);  
+        window.addEventListener('load', () => { if (!window.shaka) initPlayer(); });
     }
   </script>  
 </body>  
-</html>
 </html>
