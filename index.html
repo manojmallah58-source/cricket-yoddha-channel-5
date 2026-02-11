@@ -27,6 +27,7 @@
       background: #000;  
       object-fit: contain;  
     }  
+    /* Spinner Hidden for clean look */
     .shaka-spinner-container { display: none !important; }  
   </style>  
 </head>  
@@ -48,6 +49,7 @@
       const container = document.querySelector('.shaka-video-container');  
       const player = new shaka.Player(video);  
       
+      // UI Configuration
       const ui = new shaka.ui.Overlay(player, container, video);  
       ui.configure({  
         controlPanelElements: [  
@@ -61,21 +63,20 @@
         }  
       });  
   
-      // ✅ New Updated Stream URL
-      const streamUrl = "https://a201aivottlinear-a.akamaihd.net/OTTB/lhr-nitro/live/dash/enc/chzr1hyion/out/v1/d7130f460d41486ea7e8e3eb45f0522f/cenc.mpd";  
+      // ✅ New Stream URL Applied
+      const streamUrl = "https://otte.live.fly.ww.aiv-cdn.net/sin-nitro/live/dash/enc/wohxowvaty/out/v1/2298afadf64943adb0b44dc540ace1ce/cenc.mpd";  
       
       player.configure({  
         drm: {  
           clearKeys: {  
-            // ✅ New Updated DRM Key
-            "0b3da1a7909770f53373b0fbba96ceb0": "4561b97456e7b68904bf01057cc8e6ab"  
+            // ✅ New DRM Key Applied
+            "cd2266bd1085a92143007be26296daeb": "1a21a3cbb8e8062c3a82135a47389c2b"  
           }  
         },  
         streaming: {  
           lowLatencyMode: true,  
           jumpLargeGaps: true,
           bufferingGoal: 10,
-          manifestUpdatePeriod: 2,
           retryParameters: {
             maxAttempts: 5,
             baseDelay: 1000,
@@ -94,13 +95,13 @@
       }  
     }  
 
-    // Initialization Logic
-    if (document.readyState === 'complete') {
-      initPlayer();
-    } else {
-      document.addEventListener('shaka-ui-loaded', initPlayer);
-      window.addEventListener('load', initPlayer);
-    }
+    // Handle Initialization
+    document.addEventListener('shaka-ui-loaded', initPlayer);  
+    document.addEventListener('DOMContentLoaded', () => { 
+      if (!window.shaka) {
+        initPlayer();
+      }
+    });
   </script>  
 </body>  
 </html>
