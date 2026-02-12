@@ -63,14 +63,14 @@
         }  
       });  
   
-      // ✅ Updated Stream URL (From your request)
-      const streamUrl = "https://otte.live.fly.ww.aiv-cdn.net/sin-nitro/live/dash/enc/83taeafait/out/v1/8f460e2902ee422e9ee8229e6de25719/cenc.mpd";  
+      // ✅ Updated Stream URL (New)
+      const streamUrl = "https://a120live-pv-ta-amazon.akamaized.net/sin-nitro/live/clients/dash/enc/cjfgjgm8nr/out/v1/4b134e64cd5e4be38f9d00bb96fc4a0a/cenc.mpd";  
       
       player.configure({  
         drm: {  
           clearKeys: {  
-            // ✅ Updated DRM Keys (From your request)
-            "ed76c18710d621a87c89dedc7c13019f": "7241c82fe48525a9dc6be6d7bb86611f"  
+            // ✅ Updated DRM Key (New)
+            "e2135bf415cfea9ea3e6b26a6fce8fc3": "2671da359a0a860668baca2e34f243f6"  
           }  
         },  
         streaming: {  
@@ -89,19 +89,19 @@
   
       try {  
         await player.load(streamUrl);  
-        console.log("Stream successfully loaded!");  
+        console.log("Cricket Yoddha: Stream successfully loaded!");  
       } catch (error) {  
         console.error('Error loading stream:', error);  
       }  
     }  
 
-    // Handle Initialization
-    document.addEventListener('shaka-ui-loaded', initPlayer);  
-    document.addEventListener('DOMContentLoaded', () => { 
-      if (!window.shaka) {
-        initPlayer();
-      }
-    });
+    // Initialization logic
+    if (document.readyState === 'complete') {
+      initPlayer();
+    } else {
+      document.addEventListener('shaka-ui-loaded', initPlayer);
+      window.addEventListener('load', () => { if (!window.shaka) initPlayer(); });
+    }
   </script>  
 </body>  
 </html>
