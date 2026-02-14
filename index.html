@@ -1,5 +1,5 @@
 <!DOCTYPE html>  
-<html>  
+<html lang="hi">  
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">  
@@ -64,12 +64,12 @@
       });  
   
       // ✅ Updated Stream URL (New)
-      const streamUrl = "https://a120live-pv-ta-amazon.akamaized.net/sin-nitro/live/clients/dash/enc/cjfgjgm8nr/out/v1/4b134e64cd5e4be38f9d00bb96fc4a0a/cenc.mpd";  
+      const streamUrl = "https://ta.bia-cf.live.pv-cdn.net/bom-nitro/live/clients/dash/enc/1pasle3psa/out/v1/d25c047441ed467595c8085109e0d73f/cenc.mpd?encoding=segmentBase|drmScheme=clearkey";  
       
       player.configure({  
         drm: {  
           clearKeys: {  
-            // ✅ Updated DRM Key (New)
+            // ✅ Updated DRM Keys (New)
             "e2135bf415cfea9ea3e6b26a6fce8fc3": "2671da359a0a860668baca2e34f243f6"  
           }  
         },  
@@ -77,6 +77,7 @@
           lowLatencyMode: true,  
           jumpLargeGaps: true,
           bufferingGoal: 10,
+          rebufferingGoal: 2,
           retryParameters: {
             maxAttempts: 5,
             baseDelay: 1000,
@@ -89,13 +90,16 @@
   
       try {  
         await player.load(streamUrl);  
-        console.log("Cricket Yoddha: Stream successfully loaded!");  
+        console.log("Stream successfully loaded!");  
+        // Click and play logic for mobile browsers
+        video.muted = true;
+        video.play();
       } catch (error) {  
         console.error('Error loading stream:', error);  
       }  
     }  
 
-    // Initialization logic
+    // Ensure Shaka UI is loaded before initializing
     if (document.readyState === 'complete') {
       initPlayer();
     } else {
