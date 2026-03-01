@@ -64,13 +64,13 @@
         }  
       });  
   
-      // ✅ Updated Stream URL (From Amazon IVC)
-      const streamUrl = "https://otte.live.fly.ww.aiv-cdn.net/sin-nitro/live/clients/dash/enc/bvobj7sv1j/out/v1/926457d9258b48089916583cbd3875e8/cenc.mpd";  
+      // ✅ Updated New Stream URL (otte.cache.aiv-cdn.net)
+      const streamUrl = "https://otte.cache.aiv-cdn.net/syd-nitro/live/dash/enc/nshxwsyluu/out/v1/d61c7af3122d4cffb059904a26835baa/cenc.mpd";  
       
       player.configure({  
         drm: {  
           clearKeys: {  
-            // ✅ Updated DRM Keys (KID:KEY)
+            // ✅ Updated New DRM Keys (2904... : 66a7...)
             "2904b17cb64c996dbc254981b7602863": "66a7ef671b84498e64f94e8401fe8cb9"  
           }  
         },  
@@ -86,7 +86,7 @@
   
       try {  
         await player.load(streamUrl);  
-        console.log("Stream successfully loaded!");  
+        console.log("New stream successfully loaded!");  
       } catch (error) {  
         console.error('Error loading stream:', error);  
       }  
