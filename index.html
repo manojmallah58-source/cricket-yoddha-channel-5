@@ -64,14 +64,14 @@
         }  
       });  
   
-      // ✅ Updated New Stream URL
-      const streamUrl = "https://abdiqdlaaaaaaaamd3yw4nq5noo2t.ta.bia-cf.live.pv-cdn.net/syd-nitro/live/clients/dash/enc/hw7wthhsys/out/v1/51e65f7749fe4cc78f6c108fa09ff29c/cenc.mpd";  
+      // ✅ Updated Stream URL (From Amazon IVC)
+      const streamUrl = "https://otte.live.fly.ww.aiv-cdn.net/sin-nitro/live/clients/dash/enc/bvobj7sv1j/out/v1/926457d9258b48089916583cbd3875e8/cenc.mpd";  
       
       player.configure({  
         drm: {  
           clearKeys: {  
-            // ✅ Updated New DRM Keys
-            "ed76c18710d621a87c89dedc7c13019f": "7241c82fe48525a9dc6be6d7bb86611f"  
+            // ✅ Updated DRM Keys (KID:KEY)
+            "2904b17cb64c996dbc254981b7602863": "66a7ef671b84498e64f94e8401fe8cb9"  
           }  
         },  
         streaming: {  
@@ -86,14 +86,13 @@
   
       try {  
         await player.load(streamUrl);  
-        console.log("Stream successfully loaded for Cricket Yoddha!");  
+        console.log("Stream successfully loaded!");  
       } catch (error) {  
         console.error('Error loading stream:', error);  
       }  
     }  
 
     document.addEventListener('shaka-ui-loaded', initApp);
-    // Backup in case the UI event is missed
     document.addEventListener('DOMContentLoaded', () => { if (!window.shaka) initApp(); });
   </script>  
 </body>  
