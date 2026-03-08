@@ -3,7 +3,7 @@
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  <title>Prime By Cricket Yoddha</title>     
+  <title>Prime Hindi - Cricket Yoddha</title>     
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
   <style>  
@@ -27,7 +27,6 @@
       background: #000;  
       object-fit: contain;  
     }  
-    /* Spinner Hidden for clean look */
     .shaka-spinner-container { display: none !important; }  
   </style>  
 </head>  
@@ -64,16 +63,23 @@
         }  
       });  
   
-      // ✅ Updated New Stream URL (otte.cache.aiv-cdn.net)
-      const streamUrl = "https://otte.cache.aiv-cdn.net/syd-nitro/live/dash/enc/nshxwsyluu/out/v1/d61c7af3122d4cffb059904a26835baa/cenc.mpd";  
+      // ✅ Updated Stream URL from your request
+      const streamUrl = "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/ptptpteoh7/out/v1/564bb083afea4561a5a60c4447258379/cenc.mpd";  
       
       player.configure({  
         drm: {  
           clearKeys: {  
-            // ✅ Updated New DRM Keys (2904... : 66a7...)
-            "2904b17cb64c996dbc254981b7602863": "66a7ef671b84498e64f94e8401fe8cb9"  
+            // ✅ Updated Keys from your request
+            "470a5bda0ae8965c3ab4004c302bc1c8": "b04888df6ed570c9435b97471504bd9b"  
           }  
         },  
+        manifest: {
+          retryParameters: {
+            maxAttempts: 5,
+            baseDelay: 1000,
+            backoffFactor: 2
+          }
+        },
         streaming: {  
           lowLatencyMode: true,  
           jumpLargeGaps: true,
@@ -86,7 +92,7 @@
   
       try {  
         await player.load(streamUrl);  
-        console.log("New stream successfully loaded!");  
+        console.log("Hindi Stream successfully loaded!");  
       } catch (error) {  
         console.error('Error loading stream:', error);  
       }  
