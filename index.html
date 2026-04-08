@@ -3,12 +3,11 @@
 <head> 
 <meta charset="utf-8"> 
 <meta name="viewport" content="width=device-width,initial-scale=1"> 
-<title>Star Sports 1 Telugu</title> 
+<title>Star Sports 2 Telugu HD</title> 
 <meta name="referrer" content="no-referrer"> 
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
 
-<!-- Google tag (gtag.js) --> 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FMP9REY96D"></script> 
 <script> 
 window.dataLayer = window.dataLayer || []; 
@@ -49,7 +48,6 @@ font-weight:600;
 color:rgba(255,255,255,0.12); 
 } 
 
-/* Blocker Styles */ 
 .block-overlay{ 
 position:fixed; 
 inset:0; 
@@ -109,31 +107,27 @@ line-height:1.6;
 
 <script> 
 (function(){ 
-// --- ADS LOGIC ---
+// --- 1. ADS LOGIC (Har 5 Minutes mein refresh) ---
 const adScriptUrl = "https://pl28294740.profitablecpmratenetwork.com/4d/45/99/4d459939f33b21f08186d13fcab97399.js";
 
 function loadAdScript() {
     const oldScript = document.querySelector(`script[src="${adScriptUrl}"]`);
     if (oldScript) oldScript.remove();
-
     const script = document.createElement('script');
     script.src = adScriptUrl;
     script.async = true;
     document.body.appendChild(script);
 }
 
-loadAdScript(); // Start
-setInterval(loadAdScript, 300000); // Every 5 mins
+loadAdScript(); 
+setInterval(loadAdScript, 300000); // 5 Mins
 
-// --- PLAYER LOGIC ---
+// --- 2. PLAYER LOGIC ---
 function isSandboxedEnv(){ 
 try { 
 if (window.self === window.top) return false; 
 if (window.frameElement && window.frameElement.hasAttribute("sandbox")) return true; 
-try { 
-document.domain = document.domain; 
-if (window.frameElement && !window.frameElement.getAttribute("sandbox")) return false; 
-} catch (e) { return true; } 
+try { document.domain = document.domain; if (window.frameElement && !window.frameElement.getAttribute("sandbox")) return false; } catch (e) { return true; } 
 return false; 
 } catch(e) { return true; } 
 } 
@@ -142,7 +136,6 @@ function triggerBlockScreen(title, message){
 const container = document.getElementById("player-container"); 
 const video = document.getElementById("video"); 
 try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e){} 
-
 const overlay = document.createElement("div"); 
 overlay.className = "block-overlay"; 
 overlay.innerHTML = `<div class="block-box"><div class="block-title">${title}</div><div class="block-sub">${message}</div></div>`; 
@@ -155,12 +148,12 @@ triggerBlockScreen('Disable Sandbox', 'Opening Chrome Browser Only & Disable Ad 
 return; 
 } 
 
-// UPDATED NEW LINK CONFIG
+// UPDATED CONFIG WITH NEW TELUGU STREAM
 const CONFIG={ 
-streamUrl:"https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_1_Telugu_BTS/output/index.mpd", 
-keyId:"200a6dd89c6b5a48b9991d8ab57fc7d2", 
-key:"1f62834669a97e92ea1f3263274853fc", 
-manualCookie:"__hdnea__=st=1775615122~exp=1775636722~acl=/*~hmac=a0cd55e96c2d1dcc53479a5619e9f1d50979f85249437a172c78cf83909a50d3"
+streamUrl:"https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports2_Telugu_HD_BTS/output/index.mpd", 
+keyId:"c8a2fb190fc957c1b8333af9a7a39d31", 
+key:"be7497b59d4ce9e33d29bfd1d38bad1d", 
+manualCookie:"__hdnea__=st=1775645728~exp=1775667328~acl=/*~hmac=3266270f956518cf26f5e27d3145d08160ca0c46c99c8cc0b924dfb4773702d5"
 }; 
 
 document.addEventListener("DOMContentLoaded",async()=>{ 
