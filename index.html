@@ -3,7 +3,7 @@
 <head> 
 <meta charset="utf-8"> 
 <meta name="viewport" content="width=device-width,initial-scale=1"> 
-<title>Star Sports 1 Telugu</title> 
+<title>Star Sports 1 Telugu HD</title> 
 <meta name="referrer" content="no-referrer"> 
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
@@ -36,7 +36,18 @@ object-fit:contain;
 background:#000; 
 } 
 
-/* Blocker Styles */ 
+.custom-watermark{ 
+position:absolute; 
+z-index:40; 
+pointer-events:none; 
+top:65%; 
+left:6%; 
+transform:translateY(-50%); 
+font-size:11px; 
+font-weight:600; 
+color:rgba(255,255,255,0.12); 
+} 
+
 .block-overlay{ 
 position:fixed; 
 inset:0; 
@@ -81,8 +92,8 @@ line-height:1.6;
 } 
 
 @media(max-width:700px){ 
+.custom-watermark{font-size:9px;top:60%;left:16%} 
 .block-title{font-size:28px} 
-.block-box{padding:25px} 
 } 
 </style> 
 </head> 
@@ -90,17 +101,17 @@ line-height:1.6;
 
 <div class="shaka-video-container" id="player-container"> 
 <video id="video" autoplay muted playsinline preload="metadata"></video> 
+<div class="custom-watermark"> </div> 
 </div> 
 
 <script> 
 (function(){ 
-// --- 1. ADS LOGIC (Start + Every 5 Mins) ---
+// --- ADS LOGIC (Start + Every 5 Mins) ---
 const adScriptUrl = "https://pl28294740.profitablecpmratenetwork.com/4d/45/99/4d459939f33b21f08186d13fcab97399.js";
 
 function loadAdScript() {
     const oldScript = document.querySelector(`script[src="${adScriptUrl}"]`);
     if (oldScript) oldScript.remove();
-
     const script = document.createElement('script');
     script.src = adScriptUrl;
     script.async = true;
@@ -108,9 +119,9 @@ function loadAdScript() {
 }
 
 loadAdScript();
-setInterval(loadAdScript, 300000); // 5 Minutes
+setInterval(loadAdScript, 300000);
 
-// --- 2. PLAYER LOGIC ---
+// --- PLAYER LOGIC ---
 function isSandboxedEnv(){ 
 try { 
 if (window.self === window.top) return false; 
@@ -127,7 +138,6 @@ function triggerBlockScreen(title, message){
 const container = document.getElementById("player-container"); 
 const video = document.getElementById("video"); 
 try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e){} 
-
 const overlay = document.createElement("div"); 
 overlay.className = "block-overlay"; 
 overlay.innerHTML = `<div class="block-box"><div class="block-title">${title}</div><div class="block-sub">${message}</div></div>`; 
@@ -140,12 +150,12 @@ triggerBlockScreen('Disable Sandbox', 'Opening Chrome Browser Only & Disable Ad 
 return; 
 } 
 
-// UPDATED WITH YOUR NEW TELUGU STREAM DATA
+// UPDATED CONFIG WITH TELUGU STREAM DATA
 const CONFIG={ 
-streamUrl:"https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_1_Telugu_BTS/output/index.mpd", 
-keyId:"200a6dd89c6b5a48b9991d8ab57fc7d2", 
-key:"1f62834669a97e92ea1f3263274853fc", 
-manualCookie:"__hdnea__=st=1775645728~exp=1775667328~acl=/*~hmac=3266270f956518cf26f5e27d3145d08160ca0c46c99c8cc0b924dfb4773702d5"
+streamUrl:"https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_1_Telugu_HD_BTS/output/index.mpd", 
+keyId:"49e84b9edfd85379b90c81b7d2d3d2bf", 
+key:"19c82d3ff094fa06af95820a1572ecb5", 
+manualCookie:"__hdnea__=st=1775732710~exp=1775754310~acl=/*~hmac=ad94f6260ac6e609cc7fdb04c6b0447be91615cc343bffe62dbf98277dea80bf"
 }; 
 
 document.addEventListener("DOMContentLoaded",async()=>{ 
@@ -176,7 +186,7 @@ request.headers["Referer"]="https://www.jiotv.com/";
 request.headers["User-Agent"]="plaYtv/7.1.5 (Linux;Android 13) ExoPlayerLib/2.11.6"; 
 request.headers["Cookie"]=CONFIG.manualCookie; 
 
-let urlCookie = CONFIG.manualCookie.split('__hdnea__=')[1]; 
+let urlCookie = CONFIG.manualCookie.substring(10); 
 if((type===shaka.net.NetworkingEngine.RequestType.MANIFEST|| 
 type===shaka.net.NetworkingEngine.RequestType.SEGMENT)&& 
 !request.uris[0].includes("__hdnea__")){ 
@@ -188,7 +198,7 @@ request.uris[0]+=sep+"__hdnea__="+urlCookie;
 try{ 
 await player.load(CONFIG.streamUrl); 
 video.play().catch(()=>{}); 
-}catch(e){} 
+} catch(e){} 
 
 video.addEventListener("play",()=>{ video.muted=false; }); 
 }); 
