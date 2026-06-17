@@ -68,15 +68,15 @@
             });
 
             // UPDATED: New Stream URL and DRM Configuration
-            let streamUrl = "https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_HD2_BTS/WDVLive/index.mpd?__hdnea__=st=1781674205~exp=1781695805~acl=/bpk-tv/Star_Sports_HD2_BTS/WDVLive/*~hmac=fd08d3d3e06e25f90ee159b65847b1930fdd2123b8ddcf7595e42d186a5af41c";
+            let streamUrl = "https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_HD2_BTS/WDVLive/index.mpd";
             let drmConfig = {
                 clearKeys: {
                     "9457eb90129456fa8ea95e10ba4ac51e": "e620a970cea474c491ac78ae71a4d764"
                 }
             };
             
-            // Extracting cookie from the URL
-            let cookieHeader = "__hdnea__=st=1781674205~exp=1781695805~acl=/bpk-tv/Star_Sports_HD2_BTS/WDVLive/*~hmac=fd08d3d3e06e25f90ee159b65847b1930fdd2123b8ddcf7595e42d186a5af41c";
+            // Updated cookie based on the provided link
+            let cookieHeader = "__hdnea__=st=1781695826~exp=1781717426~acl=/bpk-tv/Star_Sports_HD2_BTS/WDVLive/*~hmac=85366b09bb890efa4872a8fc4483431361d3227b1b29b331a6a7c2288bbc4226";
 
             player.configure({
                 drm: drmConfig,
@@ -96,7 +96,7 @@
 
             player.getNetworkingEngine().registerRequestFilter((type, request) => {
                 request.headers['Referer'] = 'https://www.jiotv.com/';
-                request.headers['User-Agent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+                request.headers['User-Agent'] = "plaYtv/7.1.5 (Linux;Android 13) ExoPlayerLib/2.11.6";
                 request.headers['Cookie'] = cookieHeader;
 
                 if ((type === shaka.net.NetworkingEngine.RequestType.MANIFEST || 
