@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ten HD</title>
+    <title>Sony Ten HD</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">
     <style>
@@ -67,8 +67,8 @@
                 seekBarColors: { base: 'white', buffered: 'red', played: 'blue' }
             });
 
-            // UPDATED: New Stream URL and DRM Configuration for Ten HD
-            let streamUrl = "https://jiotvmblive.cdn.jio.com/bpk-tv/Ten_HD_MOB/WDVLive/index.mpd?__hdnea__=st=1786074155~exp=1786095755~acl=/*~hmac=61880587c23d6a2b6627c9176dc55bcb92e65add548a29e9b852f5aba20a70c0";
+            // UPDATED: New Stream URL and DRM Configuration for Sony Ten HD
+            let streamUrl = "https://jiotvmblive.cdn.jio.com/bpk-tv/Ten_HD_MOB/WDVLive/index.mpd?__hdnea__=st=1786092566~exp=1786114166~acl=/*~hmac=a66a0a8b41f141bdf44a4ab58a144c87f6921a28ca46e44e826ee0797cda1ad7";
             
             let drmConfig = {
                 clearKeys: {
@@ -76,7 +76,7 @@
                 }
             };
             
-            let cookieHeader = "__hdnea__=st=1786074155~exp=1786095755~acl=/*~hmac=61880587c23d6a2b6627c9176dc55bcb92e65add548a29e9b852f5aba20a70c0";
+            let cookieHeader = "__hdnea__=st=1786092566~exp=1786114166~acl=/*~hmac=a66a0a8b41f141bdf44a4ab58a144c87f6921a28ca46e44e826ee0797cda1ad7";
 
             player.configure({
                 drm: drmConfig,
