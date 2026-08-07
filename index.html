@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Star Sports 1 Hindi HD</title>
+    <title>Ten HD</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">
     <style>
@@ -67,17 +67,16 @@
                 seekBarColors: { base: 'white', buffered: 'red', played: 'blue' }
             });
 
-            // UPDATED: New Stream URL and DRM Configuration
-            let streamUrl = "https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_HD1_BTS/WDVLive/index.mpd?__hdnea__=st=1782372988~exp=1782394588~acl=/bpk-tv/Star_Sports_HD1_BTS/WDVLive/*~hmac=4b13cf4c77da3a1ee753b45dfb81f300f6cfdad9ab62af025c63bc0c7f6d0f71";
+            // UPDATED: New Stream URL and DRM Configuration for Ten HD
+            let streamUrl = "https://jiotvmblive.cdn.jio.com/bpk-tv/Ten_HD_MOB/WDVLive/index.mpd?__hdnea__=st=1786074155~exp=1786095755~acl=/*~hmac=61880587c23d6a2b6627c9176dc55bcb92e65add548a29e9b852f5aba20a70c0";
             
             let drmConfig = {
                 clearKeys: {
-                    "965dc2ddb1d85138ad787999a7f30ca5": "859695076e67fe961836b564db6d689c",
-                    "08638117638b55649c6befa7f5cb34f6": "58ddb6bbdf8d8b1e2aac2b5312e99086"
+                    "3525c924e54154b39533d86b1c7a428a": "8548b566fc6608a7d3bd601ee5f3d889"
                 }
             };
             
-            let cookieHeader = "__hdnea__=st=1782372988~exp=1782394588~acl=/bpk-tv/Star_Sports_HD1_BTS/WDVLive/*~hmac=4b13cf4c77da3a1ee753b45dfb81f300f6cfdad9ab62af025c63bc0c7f6d0f71";
+            let cookieHeader = "__hdnea__=st=1786074155~exp=1786095755~acl=/*~hmac=61880587c23d6a2b6627c9176dc55bcb92e65add548a29e9b852f5aba20a70c0";
 
             player.configure({
                 drm: drmConfig,
